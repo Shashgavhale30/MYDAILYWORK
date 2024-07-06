@@ -1,0 +1,160 @@
+#include <iostream>
+#include <vector>
+#include <string>
+
+class Book {
+public:
+    int id;
+    std::string title;
+    std::string author;
+    bool isIssued;
+
+    Book(int i, const std::string &t, const std::string &a)
+        : id(i), title(t), author(a), isIssued(false) {}
+};
+
+class Borrower {
+public:
+    int id;
+    std::string name;
+
+    Borrower(int i, const std::string &n) : id(i), name(n) {}
+};
+
+class Transaction {
+public:
+    int bookId;
+    int borrowerId;
+    std::string date;
+
+    Transaction(int bId, int brId, const std::string &d)
+        : bookId(bId), borrowerId(brId), date(d) {}
+};
+
+class Library {
+private:
+    std::vector<Book> books;
+    std::vector<Borrower> borrowers;
+    std::vector<Transaction> transactions;
+
+public:
+    void addBook(int id, const std::string &title, const std::string &author) {
+        books.push_back(Book(id, title, author));
+    }
+
+    void addBorrower(int id, const std::string &name) {
+        borrowers.push_back(Borrower(id, name));
+    }
+
+    void issueBook(int bookId, int borrowerId, const std::string &date) {
+        for (auto &book : books) {
+            if (book.id == bookId && !book.isIssued) {
+                book.isIssued = true;
+                transactions.push_back(Transaction(bookId, borrowerId, date));
+                std::cout << "Book issued successfully.\n";
+                return;
+            }
+        }
+        std::cout << "Book cannot be issued. It might already be issued or does not exist.\n";
+    }
+
+    void returnBook(int bookId) {
+        for (auto &book : books) {
+            if (book.id == bookId && book.isIssued) {
+                book.isIssued = false;
+                std::cout << "Book returned successfully.\n";
+                return;
+            }
+        }
+        std::cout << "Book not found or was not issued.\n";
+    }
+
+    void listBooks() {
+        for (const auto &book : books) {
+            std::cout << "ID: " << book.id << ", Title: " << book.title << ", Author: " << book.author << ", Issued: " << (book.isIssued ? "Yes" : "No") << '\n';
+        }
+    }
+
+    void listBorrowers() {
+        for (const auto &borrower : borrowers) {
+            std::cout << "ID: " << borrower.id << ", Name: " << borrower.name << '\n';
+        }
+    }
+
+    void listTransactions() {
+        for (const auto &transaction : transactions) {
+            std::cout << "Book ID: " << transaction.bookId << ", Borrower ID: " << transaction.borrowerId << ", Date: " << transaction.date << '\n';
+        }
+    }
+};
+
+int main() {
+    Library library;
+    int choice, id;
+    std::string title, author, name, date;
+
+    while (true) {
+        std::cout << "Library Management System\n";
+        std::cout << "1. Add Book\n";
+        std::cout << "2. Add Borrower\n";
+        std::cout << "3. Issue Book\n";
+        std::cout << "4. Return Book\n";
+        std::cout << "5. List Books\n";
+        std::cout << "6. List Borrowers\n";
+        std::cout << "7. List Transactions\n";
+        std::cout << "8. Exit\n";
+        std::cout << "Enter your choice: ";
+        std::cin >> choice;
+
+        switch (choice) {
+        case 1:
+            std::cout << "Enter Book ID: ";
+            std::cin >> id;
+            std::cin.ignore();
+            std::cout << "Enter Book Title: ";
+            std::getline(std::cin, title);
+            std::cout << "Enter Book Author: ";
+            std::getline(std::cin, author);
+            library.addBook(id, title, author);
+            break;
+        case 2:
+            std::cout << "Enter Borrower ID: ";
+            std::cin >> id;
+            std::cin.ignore();
+            std::cout << "Enter Borrower Name: ";
+            std::getline(std::cin, name);
+            library.addBorrower(id, name);
+            break;
+        case 3:
+            std::cout << "Enter Book ID to issue: ";
+            std::cin >> id;
+            std::cout << "Enter Borrower ID: ";
+            std::cin >> choice;
+            std::cin.ignore();
+            std::cout << "Enter Date (dd-mm-yyyy): ";
+            std::getline(std::cin, date);
+            library.issueBook(id, choice, date);
+            break;
+        case 4:
+            std::cout << "Enter Book ID to return: ";
+            std::cin >> id;
+            library.returnBook(id);
+            break;
+        case 5:
+            library.listBooks();
+            break;
+        case 6:
+            library.listBorrowers();
+            break;
+        case 7:
+            library.listTransactions();
+            break;
+        case 8:
+            return 0;
+        default:
+            std::cout << "Invalid choice. Please try again.\n";
+        }
+    }
+
+    return 0;
+}
